@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generative AI Usage Survey</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .survey-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .question {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .question label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .options {
+            display: flex;
+            gap: 20px;
+        }
+        .option {
+            display: flex;
+            align-items: center;
+        }
+        .option input {
+            margin-right: 5px;
+        }
+        button {
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #3367d6;
+        }
+        .results {
+            margin-top: 30px;
+            display: none;
+        }
+        .chart-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .chart-item {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        @media (min-width: 768px) {
+            .chart-item {
+                width: 48%;
+            }
+        }
+        .thank-you {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+            color: #4285f4;
+        }
+    </style>
+</head>
+<body>
+    <div class="survey-container">
+        <h1>Generative AI Usage Survey</h1>
+        <p>This is an anonymous survey about your use of generative AI. All questions are optional.</p>
+        
+        <form id="survey-form">
+            <div class="question">
+                <label for="q1">1. I have used generative AI for my article writing.</label>
+                <div class="options">
+                    <div class="option">
+                        <input type="radio" id="q1-yes" name="q1" value="yes">
+                        <label for="q1-yes">Yes</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" id="q1-no" name="q1" value="no">
+                        <label for="q1-no">No</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="question">
+                <label for="q2">2. I have used generative AI for peer review.</label>
+                <div class="options">
+                    <div class="option">
+                        <input type="radio" id="q2-yes" name="q2" value="yes">
+                        <label for="q2-yes">Yes</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" id="q2-no" name="q2" value="no">
+                        <label for="q2-no">No</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="question">
+                <label for="q3">3. I have used generative AI or vibe coding for data analysis.</label>
+                <div class="options">
+                    <div class="option">
+                        <input type="radio" id="q3-yes" name="q3" value="yes">
+                        <label for="q3-yes">Yes</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" id="q3-no" name="q3" value="no">
+                        <label for="q3-no">No</label>
+                    </div>
+                </div>
+            </div>
+            
+            <button type="submit">Submit</button>
+        </form>
+        
+        <div id="thank-you" class="thank-you">
+            Thank you for your response!
+        </div>
+        
+        <div id="results" class="results">
+            <h2>Survey Results</h2>
+            <div class="chart-container">
+                <div class="chart-item">
+                    <canvas id="q1-chart"></canvas>
+                </div>
+                <div class="chart-item">
+                    <canvas id="q2-chart"></canvas>
+                </div>
+                <div class="chart-item">
+                    <canvas id="q3-chart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+# File created successfully: C:\Users\huhso\Workspace\notion_ai_survey_embed\index.html
+
+# Assistant
+# Now let's create the JavaScript file to handle the form submission and data visualization:
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize the data from localStorage or with zeros
+    let surveyData = {
+        q1: { yes: 0, no: 0 },
+        q2: { yes: 0, no: 0 },
+        q3: { yes: 0, no: 0 }
+    };
+
+    // Try to load existing data
+    const savedData = localStorage.getItem('surveyData');
+    if (savedData) {
+        try {
+            surveyData = JSON.parse(savedData);
+        } catch (e) {
+            console.error('Error parsing saved data:', e);
+        }
+    }
+
+    // Update charts with current data
+    updateCharts();
+
+    // Handle form submission
+    document.getElementById('survey-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Get form data
+        const formData = new FormData(e.target);
+        
+        // Update data
+        for (let i = 1; i <= 3; i++) {
+            const answer = formData.get(`q${i}`);
+            if (answer) {
+                surveyData[`q${i}`][answer]++;
+            }
+        }
+        
+        // Save data
+        localStorage.setItem('surveyData', JSON.stringify(surveyData));
+        
+        // Show thank you message
+        document.getElementById('survey-form').style.display = 'none';
+        document.getElementById('thank-you').style.display = 'block';
+        
+        // Show results
+        document.getElementById('results').style.display = 'block';
+        
+        // Update charts
+        updateCharts();
+    });
+
+    function updateCharts() {
+        createChart('q1-chart', 'Article Writing', surveyData.q1);
+        createChart('q2-chart', 'Peer Review', surveyData.q2);
+        createChart('q3-chart', 'Data Analysis', surveyData.q3);
+    }
+
+    function createChart(canvasId, title, data) {
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        
+        // Check if chart already exists and destroy it
+        if (window[canvasId]) {
+            window[canvasId].destroy();
+        }
+        
+        // Create new chart
+        window[canvasId] = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Yes', 'No'],
+                datasets: [{
+                    label: 'Responses',
+                    data: [data.yes, data.no],
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.6)',
+                        'rgba(255, 99, 132, 0.6)'
+                    ],
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(255, 99, 132, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Generative AI for ' + title
+                    },
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Add a button to view results without submitting
+    const viewResultsButton = document.createElement('button');
+    viewResultsButton.textContent = 'View Results';
+    viewResultsButton.style.marginLeft = '10px';
+    viewResultsButton.style.backgroundColor = '#757575';
+    
+    viewResultsButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('results').style.display = 'block';
+    });
+    
+    document.querySelector('button[type="submit"]').parentNode.appendChild(viewResultsButton);
+});
+File created successfully: C:\Users\huhso\Workspace\notion_ai_survey_embed\script.js
